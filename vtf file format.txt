@@ -1,0 +1,75 @@
+ Quantec QMX VT file format
+
+
+ Odd one this...
+
+
+ Header, 0x0400 bytes.
+
+ 0000 V
+ 0003 A
+ 0006 L
+ 0009 I
+ 000C D
+ 000F A
+ 0014 T
+ 0017 E
+
+Interleaved bytes may be random or have meaning, I don't know.
+Following bytes are definitely left-over crap from memory.
+
+Frames start at 0400  "New" file initialised at size 4K, 0400 onwards zeros apart
+from a few bytes set near start of this part, but creating a frame doesn't add
+anything at 0800, so may be junk.
+
+
+Frame data format.  Aligned to 0x400 boundry
+
+ 0000 - 000D 		10 00 04 00 42 00 00 00 01 00 ff ff		04 00 - might be number of F records ?
+ 000C - 000D		Length of remaining data in record ? maybe - it doesn't seem right all the time
+
+
+ It also seems that there may be "junk" data after the header before the start of
+ the actual data - including apparent valid F record - see R.VTF 0x400. !
+
+ 000C - 000E		FE 01 46 	(FE 01 'F')
+ 000F - 001E		page number, 16 bytes, text, left justified, space filled.
+ 001F				a		frame id.
+  0020-0025			00 00 00 00 00 nn - sequence number - increaments on each F block
+
+  This lot seems to be record based - sections can, and do, appear in different orders !
+
+
+ 0025				80						?
+ 0026				60 ll hh 				CUG
+ 0029				61 ll hh 				price (x10)
+ 002C 				20 16 01 27 00			?
+ 0031				21 <9A 29> {AB} 59		last edit {date}/<time> in here somewhere
+
+ 					F0						if present, no user access
+ 	 				0A nn <text> 			free format note/command string
+ 0060				0C nn <text>			user-id of last editor eg 0C 06 SYSTEM
+
+ 0038				routing table....
+					ten entries
+						0x (x = route number 0-9)
+						nn (length of following data)
+						<text> (route, textual. * for no entry)
+					00 nn <text>
+					01 nn <text>
+					02 nn <text>
+					03 nn <text>
+					04 nn <text>
+					05 nn <text>
+					06 nn <text>
+					07 nn <text>
+					08 nn <text>
+					09 nn <text>
+ 					0e 01 2a	(route 14??? ) * means no route
+
+
+					1c nn nn nn nn x..x page data ?? nmaybe
+
+
+
+

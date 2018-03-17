@@ -1,0 +1,55 @@
+Viewdata Database API Documentation
+
+*draft 0.2*
+
+
+
+
+
+
+
+Call api.php with following parameters
+
+Mandatory:
+
+	key 			access token
+	mode			function required
+
+
+Modes -
+
+
+	services		Return a list of services available
+		No parameters
+
+	startpage		Return page number of suggested initial page
+		service		service ID
+
+	checkpage		Returns details on page availability, ie. what collections\
+		pagenumber		\it may be present in.  Return id for each option
+		subpage
+		-or-
+		id
+
+	png				Return visual representation of a frame in the specified format
+	gif
+	dynamic
+	text
+	html
+	tf
+		collection
+		pagenumber
+		subpage
+		-or-
+		id
+
+
+	meta			Return metadata for a page
+		collection
+		pagenumber
+		subpage
+		-or-
+		id
+
+
+

@@ -1,0 +1,14 @@
+the database - pages needed:
+
+
+submit pages to database
+ - remember lookup tables!
+edit database
+ - edit tables !
+
+vl display, fetch by tag or field type.
+
+vb display, display links to alternate versions.
+
+
+vv.class  for use by above.

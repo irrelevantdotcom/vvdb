@@ -1,0 +1,36 @@
+
+html template notes
+
+
+modify horizontal-timeline to be callable.	DONE timeline_init($)
+
+on load, set up selected main section with called-for page DONE
+
+fetch json - 	populate alternates list,					DONE
+				copy main section to dated section.			DONE
+
+			 call horizontal timeline to display it.		DONE
+
+ populate subframe list.		DONE
+
+
+onclick on subframe, change main page to that subframe  DONE
+	- update url
+
+onclick on timeline,PgDn, swipe etc.
+	edit main.js : updateVisibleContent() with callback.	DONEish
+	fetch json - update newly selected main section		DONE
+				populate subframe list			DONE
+	- update url.
+
+
+add data-attributes to subpages,  usetp opopulate more info sectin
+
+routing !!
+
+
+
+
+
+
+
