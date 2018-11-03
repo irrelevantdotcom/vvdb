@@ -10,6 +10,9 @@
 // Credits:
 // http://wiki.hashphp.org/PDO_Tutorial_for_MySQL_Developers
 
+//
+// version 0.1.1
+
 
 // TODO - specify column names rather than SELECT *  Especially before we populate passwords ..!
 // Use array, function, etc., to create list.
@@ -29,6 +32,10 @@ define ('VVDBTYPE_SERIAL',2);		// Serial transmission format. used CR/LF, ESC, e
 define ('VVDBTYPE_STUB',16);		// placeholder. e.g. "we know a page existed here, but no idea what was on it."
 define ('VVDBTYPE_IMAGE', 32);		// scanned image - really needs to be replaced.
 define ('VVDBTYPE_ERROR', 64);		// vvdb error template.
+
+define ('IMPORT_NEW',1);
+define ('IMPORT_VALID',2);
+define ('IMPORT_DONE',3);
 
 class vvDb{
 
@@ -54,11 +61,14 @@ class vvDb{
 	private $sqlnewvarient;
 	private $sqlgetauthors;
 	private $sqlgetusers;
+	private $sqlgetuser;
+	private $sqladduser;
 	private $sqlgetauths;
 	private $sqlinsertframe;
 	private $sqlinsertmeta;
 	private $sqlgetmeta;
 	private $sqlfindtext;
+	private $sqladdimport;
 
 	private $framefields;
 
@@ -158,6 +168,9 @@ class vvDb{
 		$this->sqlgetusers = $this->db->prepare('SELECT * FROM `users`
 					WHERE (`user_id` = :uid OR :uid IS NULL)',
 					array(PDO::ATTR_EMULATE_PREPARES=>true));
+		$this->sqlgetuser = $this->db->prepare('SELECT * FROM `users`
+					WHERE (`username` = :user)',
+					array(PDO::ATTR_EMULATE_PREPARES=>true));
 		$this->sqlgetauths = $this->db->prepare('SELECT * FROM `authenticity`
 					WHERE (`authenticity_id` = :aid OR :aid IS NULL)
 					ORDER BY `auth_score`',
@@ -174,7 +187,15 @@ class vvDb{
 					WHERE (`f`.`service_id`=:sid OR :sid IS NULL)
 					AND UPPER(`f`.`frame_content`) LIKE :text OR UPPER(`f`.`frame_description`) LIKE :text
 					ORDER BY `v`.`varient_date`, `s`.`service_name`, `f`.`frame_id`, `f`.`subframe_id`',
-		array(PDO::ATTR_EMULATE_PREPARES=>true));
+					array(PDO::ATTR_EMULATE_PREPARES=>true));
+		$this->sqladdimport = $this->db->prepare('INSERT INTO `importqueue`
+						(`user_id`, `service_id`, `file_format`, `file_comment`, `file_data`, `file_status`)
+					VALUES (:user, :service, :format, :comment, :file, :status)',
+					 array(PDO::ATTR_EMULATE_PREPARES=>false));
+		$this->sqladduser = $this->db->prepare('INSERT INTO `users` (`username`, `password`, `authlevel`, `displayname`, `email`)
+					VALUES (:user, :pass, :auth, :name, :email)',
+					array(PDO::ATTR_EMULATE_PREPARES=>false));
+
 
 // TODO - this is overkill now we have moved metadata into separate table.
 		$ins = 'INSERT INTO frames (';
@@ -340,6 +361,33 @@ class vvDb{
 		return $this->sqlgetusers->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	function validateUser($username, $password){
+		$this->sqlgetuser->execute(array(':user' => $username));
+		$user = $this->sqlgetuser->fetch(PDO::FETCH_ASSOC);
+		if (password_verify($password, $user['password'])) {
+			return $user;
+		}
+		return false;
+	}
+
+	function addUser($username, $password, $displayname, $email, $authlevel = 0){
+
+		if (empty($password) || !($pw = password_hash($password, PASSWORD_DEFAULT))) {
+			return false;
+		}
+
+		try {
+			if ($this->sqladduser->execute(array(':user' => $username, ':pass' => $pw,
+						':name' => $displayname, ':auth' => $authlevel, ':email' => $email))) {
+					return $this->db->lastInsertId();
+			} else {
+				return false;
+			}
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
 	function getAuthenticities($auth_id = null){
 		$this->sqlgetauths->execute(array(':aid' => $auth_id));
 		return $this->sqlgetauths->fetchAll(PDO::FETCH_ASSOC);
@@ -393,5 +441,37 @@ class vvDb{
 		return $id;
 	}
 
+
+	function addImportQueue($filename, $user, $format, $service_id, $comment, $status = IMPORT_NEW ){
+		$fh = fopen($filename, 'rb');
+		if (!$fh) {
+			return false;
+		}
+/*		//		VALUES (:user, :service, :format, :commment, :file, :status)',
+		$params = array(	':user' => $user['user_id'],
+							':format' => $format,
+							':service' => $service_id,
+							':comment' => $comment,
+							':status' => $status) ;
+		$this->sqladdimport->bindParam(':file', $fh, PDO::PARAM_LOB);
+		foreach ($params as $key => &$val){
+			$this->sqladdimport->bindParam($key,$val);
+		}
+
+		$this->sqladdimport->execute();
+		$id = $this->db->lastInsertId();
+*/
+		$fh = fopen($filename, 'rb');
+		$this->sqladdimport->bindValue(':file', $fh, PDO::PARAM_LOB);
+		$this->sqladdimport->bindValue(':user', $user['user_id'],PDO::PARAM_INT);
+		$this->sqladdimport->bindValue(':format', $format,PDO::PARAM_INT);
+		$this->sqladdimport->bindValue(':service', $service_id,PDO::PARAM_INT);
+		$this->sqladdimport->bindValue(':comment', $comment,PDO::PARAM_STR);
+		$this->sqladdimport->bindValue(':status', $status,PDO::PARAM_INT);
+		$this->sqladdimport->execute();
+		$id = $this->db->lastInsertId();
+
+		return $id;
+	}
 
 }

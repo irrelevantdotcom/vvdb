@@ -23,7 +23,7 @@ Word or phrase: <input type="text" name="request" size=30><br />
 </form>
 </fieldset>
 
-
+<p><strong>NEW!</strong> If you have old teletext or viewdata service pages, you can <a href='submitfile.php'>submit your data</a> here! </p>
 <p>Frames can be accessed in standard wayback-machine format -</p>
 <p>i.e. http://db.viewdata.org.uk/<i>service</i>/<i>date</i>/<i>pageandsubpage</i></p>
 <p>Here's an example: <a href='http://db.viewdata.org.uk/ceefax1/19830623200800/1000001.html'>http://db.viewdata.org.uk/ceefax1/19830623200800/1000001.html</a>	</p>
