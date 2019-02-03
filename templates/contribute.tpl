@@ -77,8 +77,8 @@ necessary data.  You will be asked to confirm details on the next page.</p>
 		{/foreach}
 {*		<option value="new">Add New User</option> *}
 	</select><br />
-	<label for="authenticity_id">Authenticity level:</label>
-	<select name="authenticity_id">
+	<label for="authenticity">Authenticity level:</label>
+	<select name="authenticity">
 	<option value="0" disabled selected>Please select</option>
 		{foreach $auths as $key => $auth}
 			<option value="{$key}">{$auth}</option>

@@ -31,7 +31,7 @@ $oldvfsp = '';
 $vfile = '';
 
 
-$varient = $db->newVarient($service, $origdate, $varient_name, $originator);
+$varient = $db->newVarient($service, $origdate, $varient_name, $originator, $authenticity_id);
 
 
 $i = 0;

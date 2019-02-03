@@ -106,8 +106,8 @@ echo "<br /><br />";
 echo "&nbsp;&nbsp;";
 
 
-foreach (array('service','varient_date','varient_name', 'originator_id') as $key){
-	echo "<input type=\"hidden\" name=\"$key\" value=\"{$_POST[$key]}\">";
+foreach (array('service','varient_date','varient_name', 'originator_id', 'authenticity') as $key){
+	echo "$key : <input type=\"text\" name=\"$key\" value=\"{$_POST[$key]}\"><br/>";
 }
 
 
@@ -203,8 +203,22 @@ function identify_and_offer($vfsp, &$cnt){
 			$sub = '';
 		}
 
-
+		$td = $vfile->ReturnMetaData($i, 'date');
 		$txt = $vfile->returnScreen($i,'internal');
+
+		if ($td) {
+			$date = $td;
+		} else {
+			$date = strtotime($_POST['varient_date']);
+			if (date('H:i:s',$date) == '00:00:00') {
+//	echo '$$' . substr($txt,32,8) . '$$';
+				$d = strtotime(date('d M Y ',$date)  . substr($txt,32,8));
+				if ($d) {
+					$date = $d;
+				}
+			}
+		}
+
 		if (substr($txt,80) == substr($prevtxt,80) || substr($txt,80) == substr($prevprevtxt,80) ) {
 			echo "<tr>\n<td valign=\"top\">Duplicate frame content skipped.. </td></tr>\n";
 			$prevprevtxt = $prevtxt; $prevtxt = $txt;
@@ -300,14 +314,14 @@ function identify_and_offer($vfsp, &$cnt){
 				$value = $r['auth_name'] . ' - ' . $r['auth_description'];
 
 				echo "<option value='$key'";
-				if ($key == $_POST['authenticity_id']) {
+				if ($key == $_POST['authenticity']) {
 					echo ' selected';
 				}
 				echo ">$value</option>\n";
 			}
 			echo "</select><br/>";
 			echo "<label for 'date_$cnt'>Date and Time:</label>";
-			echo "<input type=text name='date_$cnt' value='".$_POST['varient_date']."'><br />";
+			echo "<input type=text name='date_$cnt' value='".date( 'd-m-Y H:i:s', $date)."'><br />";
 		    echo "</td><td><br />\n";
 
 			$r = $vfile->ReturnMetaData($i, NULL);	// get list of meta's.

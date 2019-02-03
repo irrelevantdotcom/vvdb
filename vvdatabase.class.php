@@ -157,10 +157,10 @@ class vvDb{
 		$this->sqlgetvarientbydate = $this->db->prepare('SELECT * FROM `varients` `v`
 							LEFT JOIN `users` `u` ON `v`.`originator_id` = `u`.`user_id`
 					WHERE (`service_id`=:sid  OR :sid IS NULL)
-					ORDER BY ABS( DATEDIFF( `varient_date`, :date )) ASC LIMIT 1',
+					ORDER BY ABS( DATEDIFF( `varient_date`, :date )), ABS( TIMEDIFF( `varient_date`, :date ))  LIMIT 1',
 			 		array(PDO::ATTR_EMULATE_PREPARES=>true));
-		$this->sqlnewvarient = $this->db->prepare('INSERT INTO `varients` (`service_id`, `varient_date`, `varient_name`, `originator_id`)
-					VALUES (:sid, :vdate, :vname, :oid)',
+		$this->sqlnewvarient = $this->db->prepare('INSERT INTO `varients` (`service_id`, `varient_date`, `varient_name`, `originator_id`, `authenticity`, `description`)
+					VALUES (:sid, :vdate, :vname, :oid, :auth, :desc)',
 					array(PDO::ATTR_EMULATE_PREPARES=>true));
 		$this->sqlgetauthors = $this->db->prepare('SELECT * FROM `authors`
 					WHERE (`author_id`=:aid OR :aid IS NULL)',
@@ -343,8 +343,8 @@ class vvDb{
 		return $this->sqlgetvarients->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	function newVarient($service_id, $date, $name, $originator){
-		$this->sqlnewvarient->execute(array(':sid' => $service_id, ':vdate' => date("Y-m-d H:i:s", $date), ':vname' => $name, ':oid' =>$originator));
+	function newVarient($service_id, $date, $name, $originator, $authenticity = null, $description = '' ){
+		$this->sqlnewvarient->execute(array(':sid' => $service_id, ':vdate' => date("Y-m-d H:i:s", $date), ':vname' => $name, ':oid' =>$originator, ':auth' => $authenticity, ':desc' => $description ));
 		return $this->db->lastInsertId();
 	}
 
