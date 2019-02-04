@@ -18,6 +18,7 @@ necessary data.  You will be asked to confirm details on the next page.</p>
 <form action="" method="post"
 	enctype="multipart/form-data">
 
+		<input type="hidden" name="tag" value="{$tag}">
 <table border=1>
 	<tr><td>
 		If you wish to re-process a previously uploaded file, please select it here</p>

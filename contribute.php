@@ -16,6 +16,11 @@ include("vvdatabase.class.php");
 include_once('smarty/libs/Smarty.class.php');
 include_once('config.php');
 
+if (empty($_GET['tag']) || $_GET['tag'] != $config['contag']) {
+	if (empty($_POST['tag']) || $_POST['tag'] != $config['contag']) {
+		die('Invalid call');
+	}
+}
 
 $db = new vvDb();
 // Connect to database.  Returns error message if unable to connect.
@@ -89,6 +94,7 @@ if (!isset($_POST["action"])) {
 	}
 	$smarty->assign('filetypes',$formats);
 
+	$smarty->assign('tag',$config['contag']);
 
 	$smarty->display('templates/contribute.tpl');
     exit;
@@ -219,7 +225,7 @@ function identify_and_offer($vfsp, &$cnt){
 			}
 		}
 
-		if (substr($txt,80) == substr($prevtxt,80) || substr($txt,80) == substr($prevprevtxt,80) ) {
+		if (trim(substr($txt,80)) != '' && (substr($txt,80) == substr($prevtxt,80) || substr($txt,80) == substr($prevprevtxt,80) )) {
 			echo "<tr>\n<td valign=\"top\">Duplicate frame content skipped.. </td></tr>\n";
 			$prevprevtxt = $prevtxt; $prevtxt = $txt;
 			$cnt++;
