@@ -123,6 +123,7 @@ $cnt = 0;
 
 if ($_POST["action"] == "Submit") {
 
+	$dedupe = isset($_POST['dedupe']);
 
 	foreach (array_keys($_FILES["file"]["name"]) as $i){
 
@@ -225,7 +226,7 @@ function identify_and_offer($vfsp, &$cnt){
 			}
 		}
 
-		if (trim(substr($txt,80)) != '' && (substr($txt,80) == substr($prevtxt,80) || substr($txt,80) == substr($prevprevtxt,80) )) {
+		if ($dedupe && (trim(substr($txt,80)) != '' && (substr($txt,80) == substr($prevtxt,80) || substr($txt,80) == substr($prevprevtxt,80) ))) {
 			echo "<tr>\n<td valign=\"top\">Duplicate frame content skipped.. </td></tr>\n";
 			$prevprevtxt = $prevtxt; $prevtxt = $txt;
 			$cnt++;

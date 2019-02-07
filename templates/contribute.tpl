@@ -94,7 +94,12 @@ necessary data.  You will be asked to confirm details on the next page.</p>
 			<option value="{$key}">{$auth}</option>
 		{/foreach}
 {*		<option value="new">Add New User</option> *}
-	</select>
+	</select><br />
+	<input type='checkbox' name="dedupe" value="1" checked>
+	<label for="dedupe">Deduplicate</label><br>
+	<input type='checkbox' name="confirm" value="1" checked>
+	<label for="confirm">Confirm contents</label><br>
+
 
 </td></tr>
 
